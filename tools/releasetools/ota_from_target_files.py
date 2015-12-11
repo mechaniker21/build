@@ -522,6 +522,13 @@ def CopyInstallTools(output_zip):
       install_target = os.path.join("install", os.path.relpath(root, install_path), f)
       output_zip.write(install_source, install_target)
 
+  supersu_path = os.path.join(OPTIONS.input_tmp, "SUPERSU")
+  for root, subdirs, files in os.walk(supersu_path):
+    for f in files:
+      supersu_source = os.path.join(root, f)
+      supersu_target = os.path.join("supersu", os.path.relpath(root, supersu_path), f)
+      output_zip.write(supersu_source, supersu_target)
+
 
 def WriteFullOTAPackage(input_zip, output_zip):
   # TODO: how to determine this?  We don't know what version it will
@@ -679,20 +686,25 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     # image.  This has the effect of writing new data from the package
     # to the entire partition, but lets us reuse the updater code that
     # writes incrementals to do it.
+    script.Print("Formatting system partition...")
+    script.FormatPartition("/system")
+    script.Print("Installing ROM...")
     script.Print("Updating system partition")
     system_tgt = GetImage("system", OPTIONS.input_tmp, OPTIONS.info_dict)
     system_tgt.ResetFileMap()
     system_diff = common.BlockDifference("system", system_tgt, src=None)
     system_diff.WriteScript(script, output_zip)
   else:
-    script.Print("Formatting system partition")
+    script.Print("{*} Formatting /system")
     script.FormatPartition("/system")
     script.Mount("/system", recovery_mount_options)
     if not has_recovery_patch:
       script.UnpackPackageDir("recovery", "/system")
+    script.Print("{*} Extracting /system")
     script.UnpackPackageDir("system", "/system")
 
     symlinks = CopyPartitionFiles(system_items, input_zip, output_zip)
+    script.Print("{*} Symlinking")
     script.MakeSymlinks(symlinks)
 
   boot_img = common.GetBootableImage("boot.img", "boot.img",
@@ -706,6 +718,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     common.MakeRecoveryPatch(OPTIONS.input_tmp, output_sink,
                              recovery_img, boot_img)
 
+    script.Print("{*} Setting permissions")
     system_items.GetMetadata(input_zip)
     system_items.Get("system").SetPermissions(script)
 
@@ -735,6 +748,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   device_specific.FullOTA_PostValidate()
 
   if OPTIONS.backuptool:
+    script.Print("{*} Restoring backup")
     script.ShowProgress(0.02, 10)
     if block_based:
       script.Mount("/system")
@@ -742,22 +756,36 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     if block_based:
       script.Unmount("/system")
 
+  script.Print("{*} Flashing boot.img")
   script.ShowProgress(0.05, 5)
-  script.Print("Updating boot image")
   script.WriteRawImage("/boot", "boot.img")
 
   script.ShowProgress(0.2, 10)
-  script.Print("Thanks for choosing CMRemix-Roms!")
   device_specific.FullOTA_InstallEnd()
 
   if OPTIONS.extra_script is not None:
     script.AppendExtra(OPTIONS.extra_script)
 
+  script.Print("{*} Unmounting")
   script.UnmountAll()
 
   if OPTIONS.wipe_user_data:
+    script.Print("{*} Formatting user data")
     script.ShowProgress(0.1, 10)
     script.FormatPartition("/data")
+
+  script.Print("{*} Installing SuperSU")
+  script.UnpackPackageDir("supersu", "/tmp/supersu");
+  script.AppendExtra("""run_program("/sbin/busybox", "unzip", "/tmp/supersu/supersu.zip", "META-INF/com/google/android/*", "-d", "/tmp/supersu");""");
+  script.AppendExtra("""run_program("/sbin/busybox", "sh", "/tmp/supersu/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/supersu/supersu.zip");""");
+
+  script.AppendExtra("""run_program("/sbin/busybox", "mount", "/data");
+  run_program("/sbin/busybox", "mount", "/system");
+  delete_recursive("/data/UKM");
+  run_program("/sbin/sh", "-c", "mv /system/UKM /data/");
+  run_program("/sbin/sh", "-c", "chmod -R 775 /data/UKM");""")
+
+  script.Print("{+} Enjoy CMRemix Rom!")
 
   if OPTIONS.two_step:
     script.AppendExtra("""
