@@ -1102,7 +1102,7 @@ installed_static_library_notice_file_targets := \
     $(foreach lib,$(my_static_libraries) $(my_whole_static_libraries), \
       NOTICE-$(if $(LOCAL_IS_HOST_MODULE),HOST,TARGET)-STATIC_LIBRARIES-$(lib))
 
-ifeq (,$(filter 5.2% 6.0%,$(TARGET_GCC_VERSION)))
+ifeq (,$(filter 5.2% 5.3% 6.0%,$(TARGET_GCC_VERSION)))
 
   # Default is -fno-rtti.
   ifeq ($(strip $(LOCAL_RTTI_FLAG)),)
