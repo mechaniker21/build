@@ -111,6 +111,10 @@ $(combo_2nd_arch_prefix)TARGET_thumb_CFLAGS :=  -mthumb \
                         -fomit-frame-pointer \
                         -fno-strict-aliasing
 
+ifeq ($(strip $(LOCAL_STRICT_ALIASING)),true)
+  $(combo_2nd_arch_prefix)TARGET_arm_CFLAGS += -fstrict-aliasing -Wstrict-aliasing=3 -Werror=strict-aliasing
+endif
+
 # Set FORCE_ARM_DEBUGGING to "true" in your buildspec.mk
 # or in your environment to force a full arm build, even for
 # files that are normally built as thumb; this can make
@@ -157,6 +161,12 @@ $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
 			-w \
 			-O2 -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone \
 			-mvectorize-with-neon-quad
+
+# Currently building with GCC 5.x yields to false positives errors
+# This ensures the build is not hatled on the following errors
+ifneq ($(filter $($(combo_2nd_arch_prefix)TARGET_GCC_VERSION), 5.1 5.1.%),)
+    TARGET_GLOBAL_CFLAGS += -Wno-array-bounds -Wno-strict-overflow
+endif
 
 # This is to avoid the dreaded warning compiler message:
 #   note: the mangling of 'va_list' has changed in GCC 4.4
