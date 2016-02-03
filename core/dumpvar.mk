@@ -164,3 +164,28 @@ $(info   $(CLR_BLU)CCACHE_BASEDIR = $(CLR_CYN)$(CCACHE_BASEDIR))
 endif
 $(info   $(CLR_CYN)============================================$(CLR_RST))
 endif
+$(info =====================================================================)
+ifdef TARGET_DEVICE
+$(info   TARGET_DEVICE=$(TARGET_DEVICE))
+endif
+ifdef TARGET_DRAGONTC_VERSION
+$(info   DRAGONTC_VERSION=$(TARGET_DRAGONTC_VERSION))
+else
+$(info   CLANG_VERSION=$(LLVM_PREBUILTS_VERSION))
+endif
+ifdef SM_AND_NAME
+$(info   TARGET_SABERMOD_ANDROID_GCC_VERSION=$(SM_AND_NAME))
+endif
+ifdef SM_KERNEL_NAME
+$(info   TARGET_SABERMOD_KERNEL_GCC_VERSION=$(SM_KERNEL_NAME))
+endif
+ifdef TARGET_NDK_VERSION
+$(info   TARGET_NDK_VERSION=$(TARGET_NDK_VERSION))
+else
+$(info   TARGET_NDK_VERSION=$(SM_AND_VERSION))
+endif
+ifdef GCC_OPTIMIZATION_LEVELS
+$(info   OPTIMIZATIONS=$(GCC_OPTIMIZATION_LEVELS))
+endif
+$(info =====================================================================)
+endif
