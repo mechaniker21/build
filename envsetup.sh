@@ -622,11 +622,13 @@ function lunch()
         # if we can't find a product, try to grab it off the AOKP github
         T=$(gettop)
         pushd $T > /dev/null
+        build/tools/emotroid.py $product
         build/tools/unicorndust.py $product
         build/tools/roomservice.py $product true
         popd > /dev/null
         check_product $product
     else
+        build/tools/emotroid.py $product true
         build/tools/unicorndust.py $product true
         build/tools/roomservice.py $product true
     fi
