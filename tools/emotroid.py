@@ -36,12 +36,12 @@ except ImportError:
 
 # Config
 # set this to the default remote to use in repo
-default_rem = "aokp"
+default_rem = "cm"
 # set this to the default revision to use (branch/tag name)
-default_rev = "mm"
+default_rev = "cm-13.0"
 # set this to the remote that you use for projects from your team repos
 # example fetch="https://github.com/omnirom"
-default_team_rem = "github"
+default_team_rem = "Emotroid-Rom"
 # this shouldn't change unless google makes changes
 local_manifest_dir = ".repo/local_manifests"
 # change this to your name on github (or equivalent hosting)
@@ -120,7 +120,7 @@ def iterate_manifests(check_all):
 
 
 def check_project_exists(url, revision, path):
-    for project in iterate_manifests():
+    for project in iterate_manifests(True):
         if project.get("name") == url and project.get("revision") == revision and project.get("path") == path:
             return True
     return False
