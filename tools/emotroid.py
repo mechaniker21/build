@@ -249,7 +249,7 @@ def check_manifest_problems(dependencies):
         remote = dependency.get("remote", default_rem)
 
         # check for existing projects
-        for project in iterate_manifests():
+        for project in iterate_manifests(True):
             if project.get("path") == target_path and project.get("revision") != revision:
                 print("WARNING: force recreation - detected conflict in revisions for repostory ", repository)
                 os.remove('/'.join([local_manifest_dir, "roomservice.xml"]))
