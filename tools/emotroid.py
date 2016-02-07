@@ -239,6 +239,22 @@ def parse_dependency_file(location):
     return dependencies
 
 
+# if there is any conflict with existing and new
+# delete the roomservice.xml file and create new
+def check_manifest_problems(dependencies):
+    for dependency in dependencies:
+        repository = dependency.get("repository")
+        target_path = dependency.get("target_path")
+        revision = dependency.get("revision", default_rev)
+        remote = dependency.get("remote", default_rem)
+
+        # check for existing projects
+        for project in iterate_manifests():
+            if project.get("path") == target_path and project.get("revision") != revision:
+                print("WARNING: force recreation - detected conflict in revisions for repostory ", repository)
+                os.remove('/'.join([local_manifest_dir, "roomservice.xml"]))
+                return
+
 def create_dependency_manifest(dependencies):
     projects = []
     for dependency in dependencies:
@@ -270,7 +286,9 @@ def fetch_dependencies(device):
         raise Exception("ERROR: could not find your device "
                         "folder location, bailing out")
     dependencies = parse_dependency_file(location)
+    check_manifest_problems(dependencies)
     create_dependency_manifest(dependencies)
+    fetch_device(device)
 
 
 def check_device_exists(device):
@@ -283,7 +301,6 @@ def check_device_exists(device):
 def fetch_device(device):
     if check_device_exists(device):
         print("WARNING: Trying to fetch a device that's already there")
-        return
     git_data = search_github_for_device(device)
     device_url = android_team+"/"+get_device_url(git_data)
     device_dir = parse_device_directory(device_url,device)
