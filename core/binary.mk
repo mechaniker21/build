@@ -32,6 +32,11 @@ endif
 
 ### Begin Sabermod  optimizations ###
 
+# Add pthread support global
+ifeq ($(ENABLE_PTHREAD),true)
+  include $(BUILD_SYSTEM)/pthread.mk
+endif
+
 # CPU Tuning flags
 include $(BUILD_SYSTEM)/tune.mk
 
