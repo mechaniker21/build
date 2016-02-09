@@ -89,6 +89,8 @@ $(info   CYNGN_TARGET=$(CYNGN_TARGET))
 $(info   CYNGN_FEATURES=$(CYNGN_FEATURES))
 endif
 $(info =====================================================================)
+$(info   CMREMIX_VERSION=$(CMREMIX_VERSION))
+$(info   KERNEL_VERSION=$(KERNEL_VERSION))
 ifdef TARGET_DEVICE
 $(info   TARGET_DEVICE=$(TARGET_DEVICE))
 endif
