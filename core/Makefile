@@ -1230,10 +1230,6 @@ endef
 $(BUILT_SYSTEMIMAGE): $(FULL_SYSTEMIMAGE_DEPS) $(INSTALLED_FILES_FILE)
 	$(call build-systemimage-target,$@)
 
-ifndef I_WANT_A_QUAIL_STAR
-$(BUILT_SYSTEMIMAGE): checkapi
-endif
-
 INSTALLED_SYSTEMIMAGE := $(PRODUCT_OUT)/system.img
 SYSTEMIMAGE_SOURCE_DIR := $(TARGET_OUT)
 
@@ -1937,7 +1933,7 @@ rainbowfarts: bacon
 	@echo -e ${CL_CYN}"=============================-Package complete-============================="${CL_RST}
 	@echo -e ${CL_CYN}"Folder : "${CL_MAG} $(AOKP_TARGET_PACKAGE_FOLDER)${CL_RST}
 	@echo -e ${CL_CYN}"ZipName: "${CL_MAG} $(AOKP_VERSION).zip${CL_RST}
-	@echo -e ${CL_CYN}"MD5    : "${CL_MAG}" $(shell cat $(AOKP_TARGET_PACKAGE).md5sum)"${CL_RST}
+	@echo -e ${CL_CYN}"MD5    : "${CL_MAG}" $(shell cat $(AOKP_TARGET_PACKAGE).md5sum | awk '{print $$1}')"${CL_RST}
 	@echo -e ${CL_CYN}"Size   : "${CL_MAG}" $(shell du -hs $(AOKP_TARGET_PACKAGE) | awk '{print $$1}')"${CL_RST}
 	@echo -e ${CL_CYN}"============================================================================"${CL_RST}
 	@echo -e ""
@@ -2272,6 +2268,8 @@ include $(sort $(wildcard $(BUILD_SYSTEM)/tasks/*.mk))
 # Also the project-specific tasks
 -include $(sort $(wildcard vendor/*/*/build/tasks/*.mk))
 -include $(sort $(wildcard device/*/*/build/tasks/*.mk))
+# Include any vendor specific apicheck.mk file
+-include $(TOPDIR)vendor/*/build/core/apicheck.mk
 endif
 
 # -----------------------------------------------------------------
