@@ -522,14 +522,6 @@ def CopyInstallTools(output_zip):
       install_target = os.path.join("install", os.path.relpath(root, install_path), f)
       output_zip.write(install_source, install_target)
 
-  supersu_path = os.path.join(OPTIONS.input_tmp, "SUPERSU")
-  for root, subdirs, files in os.walk(supersu_path):
-    for f in files:
-      supersu_source = os.path.join(root, f)
-      supersu_target = os.path.join("supersu", os.path.relpath(root, supersu_path), f)
-      output_zip.write(supersu_source, supersu_target)
-
-
 def WriteFullOTAPackage(input_zip, output_zip):
   # TODO: how to determine this?  We don't know what version it will
   # be installed on top of. For now, we expect the API just won't
@@ -773,17 +765,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Print("{*} Formatting user data")
     script.ShowProgress(0.1, 10)
     script.FormatPartition("/data")
-
-  script.Print("{*} Installing SuperSU")
-  script.UnpackPackageDir("supersu", "/tmp/supersu");
-  script.AppendExtra("""run_program("/sbin/busybox", "unzip", "/tmp/supersu/supersu.zip", "META-INF/com/google/android/*", "-d", "/tmp/supersu");""");
-  script.AppendExtra("""run_program("/sbin/busybox", "sh", "/tmp/supersu/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/supersu/supersu.zip");""");
-
-  script.AppendExtra("""run_program("/sbin/busybox", "mount", "/data");
-  run_program("/sbin/busybox", "mount", "/system");
-  delete_recursive("/data/UKM");
-  run_program("/sbin/sh", "-c", "mv /system/UKM /data/");
-  run_program("/sbin/sh", "-c", "chmod -R 775 /data/UKM");""")
 
   script.Print("{+} Enjoy CMRemix Rom!")
 
