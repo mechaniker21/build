@@ -665,23 +665,28 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Print("*   Compiled: %s"%(build));
 
   device = GetBuildProp("ro.aokp.device", OPTIONS.info_dict)
-  brand = GetBuildProp("ro.product.brand", OPTIONS.info_dict)
-  name = GetBuildProp("ro.product.name", OPTIONS.info_dict)
-  script.Print("*   Device: %s %s (%s)"%(brand, name, device));
-  script.Print("******************************************");
+  if GetBuildProp("ro.product.model", OPTIONS.info_dict) is not None:
+      model = GetBuildProp("ro.product.model", OPTIONS.info_dict)
+      script.Print("*   Device: %s (%s)"%(model, device));
+      script.Print("******************************************");
+  else:
+      script.Print("*   Device: %s "%(device));
+      script.Print("******************************************");
+
 
   if OPTIONS.wipe_user_data:
     system_progress -= 0.1
   if HasVendorPartition(input_zip):
     system_progress -= 0.1
 
-  script.AppendExtra("if is_mounted(\"/data\") then")
-  script.ValidateSignatures("data")
-  script.AppendExtra("else")
-  script.Mount("/data")
-  script.ValidateSignatures("data")
-  script.Unmount("/data")
-  script.AppendExtra("endif;")
+  if not OPTIONS.wipe_user_data:
+    script.AppendExtra("if is_mounted(\"/data\") then")
+    script.ValidateSignatures("data")
+    script.AppendExtra("else")
+    script.Mount("/data")
+    script.ValidateSignatures("data")
+    script.Unmount("/data")
+    script.AppendExtra("endif;")
 
   if "selinux_fc" in OPTIONS.info_dict:
     WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
@@ -826,7 +831,8 @@ def GetBuildProp(prop, info_dict):
   try:
     return info_dict.get("build.prop", {})[prop]
   except KeyError:
-    raise common.ExternalError("couldn't find %s in build.prop" % (prop,))
+    print ("WARNING: could not find %s in build.prop" % (prop,))
+    return None
 
 
 def AddToKnownPaths(filename, known_paths):
