@@ -1849,6 +1849,8 @@ ifneq (,$(INSTALLED_RECOVERYIMAGE_TARGET)$(filter true,$(BOARD_USES_RECOVERY_AS_
 		$(TARGET_RECOVERY_ROOT_OUT),$(zip_root)/$(PRIVATE_RECOVERY_OUT)/RAMDISK)
 	@# OTA install helpers
 	$(hide) $(call package_files-copy-root, $(OUT)/install, $(zip_root)/INSTALL)
+	@# SuperSU
+	$(hide) $(call package_files-copy-root, $(OUT)/supersu, $(zip_root)/SUPERSU)
 ifdef INSTALLED_KERNEL_TARGET
 	$(hide) $(ACP) $(INSTALLED_KERNEL_TARGET) $(zip_root)/$(PRIVATE_RECOVERY_OUT)/kernel
 endif
