@@ -136,7 +136,7 @@ $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
 			-ffunction-sections \
 			-fdata-sections \
 			-funwind-tables \
-			-fstack-protector \
+			-fstack-protector-strong \
 			-Wno-unused -Wno-unused-parameter -Wno-error=unused -Wno-error=unused-parameter \
 			-Wa,--noexecstack \
 			-Werror=format-security \
