@@ -96,14 +96,7 @@ CLANG_CONFIG_UNKNOWN_CFLAGS := \
   -Wno-unused-local-typedefs \
   -Wunused-but-set-parameter \
   -Wunused-but-set-variable \
-  -fdiagnostics-color \
-  -fmodulo-sched \
-  -fmodulo-sched-allow-regmoves \
-  -mvectorize-with-neon-quad \
-  -fpredictive-commoning \
-  -ftree-loop-vectorize \
-  -ftree-partial-pre \
-  -fipa-cp-clone
+  -fdiagnostics-color
 
 # Clang flags for all host rules
 CLANG_CONFIG_HOST_EXTRA_ASFLAGS :=

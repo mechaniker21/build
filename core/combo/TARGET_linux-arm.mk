@@ -98,16 +98,27 @@ $(combo_2nd_arch_prefix)TARGET_LD := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREF
 $(combo_2nd_arch_prefix)TARGET_READELF := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)readelf$(HOST_EXECUTABLE_SUFFIX)
 $(combo_2nd_arch_prefix)TARGET_STRIP := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)strip$(HOST_EXECUTABLE_SUFFIX)
 
+# Compiler linkers
+$(combo_2nd_arch_prefix)TARGET_LD := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)ld$(HOST_EXECUTABLE_SUFFIX)
+ifneq ($(DISABLE_GOLD_LINKER),true)
+  # The gold linker uses much less memory and greatly improves compile time of large projects.
+  $(combo_2nd_arch_prefix)TARGET_LD := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)ld.gold$(HOST_EXECUTABLE_SUFFIX)
+endif
+ifeq ($(ENABLE_BFD_LINKER),true)
+  # The bfd linker supports a much wider range of targets, but has little use in Android.
+  $(combo_2nd_arch_prefix)TARGET_LD := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)ld.bfd$(HOST_EXECUTABLE_SUFFIX)
+endif
+
 $(combo_2nd_arch_prefix)TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
 
-$(combo_2nd_arch_prefix)TARGET_arm_CFLAGS :=    -O2 -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone \
+$(combo_2nd_arch_prefix)TARGET_arm_CFLAGS :=    -O2 \
                         -fomit-frame-pointer \
                         -fstrict-aliasing    \
                         -funswitch-loops
 
 # Modules can choose to compile some source as thumb.
 $(combo_2nd_arch_prefix)TARGET_thumb_CFLAGS :=  -mthumb \
-                        -O2 -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone \
+                        -Os \
                         -fomit-frame-pointer \
                         -fno-strict-aliasing
 
@@ -132,12 +143,11 @@ endif
 android_config_h := $(call select-android-config-h,linux-arm)
 
 $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
-			-mfloat-abi=softfp \
+			-msoft-float \
 			-ffunction-sections \
 			-fdata-sections \
 			-funwind-tables \
 			-fstack-protector-strong \
-			-Wno-unused -Wno-unused-parameter -Wno-error=unused -Wno-error=unused-parameter \
 			-Wa,--noexecstack \
 			-Werror=format-security \
 			-D_FORTIFY_SOURCE=2 \
@@ -148,19 +158,14 @@ $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
 			-include $(android_config_h) \
 			-I $(dir $(android_config_h))
 
-# More flags/options can be added here
-$(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
-			-DNDEBUG \
-			-Wstrict-aliasing=2 \
-			-fgcse-after-reload \
-			-frerun-cse-after-loop \
-			-frename-registers
-
-# arter97
-$(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
-			-w \
-			-O2 -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone \
-			-mvectorize-with-neon-quad
+# The "-Wunused-but-set-variable" option often breaks projects that enable
+# "-Wall -Werror" due to a commom idiom "ALOGV(mesg)" where ALOGV is turned
+# into no-op in some builds while mesg is defined earlier. So we explicitly
+# disable "-Wunused-but-set-variable" here.
+ifneq ($(filter 4.6 4.6.% 4.7 4.7.% 4.8 4.9, $($(combo_2nd_arch_prefix)TARGET_GCC_VERSION)),)
+$(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += -fno-builtin-sin \
+			-fno-strict-volatile-bitfields
+endif
 
 # Currently building with GCC 5.x yields to false positives errors
 # This ensures the build is not hatled on the following errors
@@ -196,6 +201,15 @@ $(combo_2nd_arch_prefix)TARGET_GLOBAL_LDFLAGS += $(BOARD_GLOBAL_LDFLAGS)
 $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += -mthumb-interwork
 
 $(combo_2nd_arch_prefix)TARGET_GLOBAL_CPPFLAGS += -fvisibility-inlines-hidden
+
+# More flags/options can be added here
+$(combo_2nd_arch_prefix)TARGET_RELEASE_CFLAGS := \
+			-DNDEBUG \
+			-g \
+			-Wstrict-aliasing=2 \
+			-fgcse-after-reload \
+			-frerun-cse-after-loop \
+			-frename-registers
 
 libc_root := bionic/libc
 libm_root := bionic/libm
