@@ -141,7 +141,8 @@ ifeq ($(strip $(LOCAL_STRICT_ALIASING)),true)
     libuclibcrpc \
     busybox \
     libOmxVenc \
-    fio
+    fio \
+    libbluetooth_jni
 
   # Check if there's already something somewhere.
   ifndef LOCAL_DISABLE_STRICT_ALIASING
