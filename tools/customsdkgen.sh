@@ -7,7 +7,7 @@ CUSTOM_NAME=aokp
 . ${ANDROID_BUILD_TOP}/vendor/aokp/tools/colors
 
 if [ -z "$OUT" ]; then
-    echo -e $CL_RED"Please lunch a product before using this command"$CL_RST
+    echo -e $red"Please lunch a product before using this command"$rst
     exit 1
 else
     OUTDIR=${OUT%/*/*/*}
@@ -40,14 +40,14 @@ $(cd ${TMP_DIR}; jar -xf ${COMMONJAR})
 
 jar -cf ${OUTDIR}/android.jar -C ${TMP_DIR}/ .
 
-echo -e $CL_GRN"android.jar created at ${OUTDIR}/android.jar"$CL_RST
-echo -e $CL_YLW"Now attempting to create new sdk platform with it"$CL_RST
+echo -e $grn"android.jar created at ${OUTDIR}/android.jar"$rst
+echo -e $ylw"Now attempting to create new sdk platform with it"$rst
 
 if [ -z "$ANDROID_HOME" ]; then
     ANDROID=$(command -v emulator)
     ANDROID_HOME=${ANDROID%/*}
     if [ -z "$ANDROID_HOME" ]; then
-        echo -e $CL_RED"ANDROID_HOME variable is not set. Do you have the sdk installed ?"$CL_RST
+        echo -e $red"ANDROID_HOME variable is not set. Do you have the sdk installed ?"$rst
         exit 1
     fi
 fi
@@ -61,6 +61,6 @@ sed -i 's/AndroidVersion.ApiLevel=23/AndroidVersion.ApiLevel=123/' ${ANDROID_HOM
 sed -i 's/Pkg.Desc=/Pkg.Desc=AOKP /' ${ANDROID_HOME}/platforms/android-${SDK_VER}-${CUSTOM_NAME}/source.properties
 
 if [ -f ${ANDROID_HOME}/platforms/android-${SDK_VER}-${CUSTOM_NAME}/android.jar ]; then
-    echo -e $CL_CYN"New SDK platform with custom android.jar created inside ${ANDROID_HOME}"$CL_RST
+    echo -e $cya"New SDK platform with custom android.jar created inside ${ANDROID_HOME}"$rst
 fi
 

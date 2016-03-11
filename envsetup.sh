@@ -57,6 +57,9 @@ EOF
     done | column
 }
 
+# Load ANSI color palette
+. ./vendor/aokp/tools/colors
+
 # Get the value of a build variable as an absolute path.
 function get_abs_build_var()
 {
@@ -733,7 +736,7 @@ function tapas()
 function eat()
 {
     if [ "$OUT" ] ; then
-        MODVERSION=$(get_build_var AOKP_VERSION)
+        MODVERSION=$(get_build_var AOKP_BUILD_VERSION)
         ZIPFILE=aokp-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
