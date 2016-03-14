@@ -1929,16 +1929,15 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   $(if $(OEM_OTA_CONFIG), -o $(OEM_OTA_CONFIG)) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-AOKP_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AOKP_VERSION).zip
-AOKP_TARGET_PACKAGE_FOLDER := $(PRODUCT_OUT)
+AOKP_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AOKP_BUILD_VERSION).zip
 
-.PHONY: otapackage bacon rainbowfarts
+.PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
+	$(hide) find $(PRODUCT_OUT) -maxdepth 1 -xdev -samefile $(INTERNAL_OTA_PACKAGE_TARGET) | grep -v ota-$(FILE_NAME_TAG) | xargs rm -f
+	$(hide) rm -f $(PRODUCT_OUT)/*.md5sum
 	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(AOKP_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(AOKP_TARGET_PACKAGE) > $(AOKP_TARGET_PACKAGE).md5sum
-rainbowfarts: bacon
-	@echo -e ""
+	$(hide) (cd `dirname $(AOKP_TARGET_PACKAGE)` && $(MD5SUM) `basename $(AOKP_TARGET_PACKAGE)` > $(AOKP_TARGET_PACKAGE).md5sum)
 	@echo -e ${CL_CYN}"============================================================================"${CL_RST}
 	@echo -e ${CL_RED}"                    ______"${CL_MAG}"  _____"${CL_CYN}"   __  __"${CL_BLU}"   _____"${CL_RST}
 	@echo -e ${CL_RED}"                   /\\\\  _  \\\\"${CL_MAG}"/\\\\  __\`\\\\"${CL_CYN}"/\\\\ \\\\/\\\\ \\\\"${CL_BLU}" /\\\\  _ \`\\\\"${CL_RST}
@@ -1948,13 +1947,12 @@ rainbowfarts: bacon
 	@echo -e ${CL_RED}"                      \\\\ \\\\_\\\\ \\\\_\\\\"${CL_MAG}" \\\\_____\\\\"${CL_CYN}" \\\\_\\\\ \\\\_\\\\"${CL_BLU}"\\\\ \\\\_\\\\"${CL_RST}
 	@echo -e ${CL_RED}"                       \\\\/_/\\\\/_/"${CL_MAG}"\\\\/_____/"${CL_CYN}"\\\\/_/\\\\/_/"${CL_BLU}" \\\\/_/"${CL_RST}
 	@echo -e ""
-	@echo -e ${CL_CYN}"=============================-Package complete-============================="${CL_RST}
-	@echo -e ${CL_CYN}"Folder : "${CL_MAG} $(AOKP_TARGET_PACKAGE_FOLDER)${CL_RST}
-	@echo -e ${CL_CYN}"ZipName: "${CL_MAG} $(subst $(AOKP_TARGET_PACKAGE_FOLDER)/,,$(AOKP_TARGET_PACKAGE))${CL_RST}
-	@echo -e ${CL_CYN}"MD5    : "${CL_MAG}" $(shell cat $(AOKP_TARGET_PACKAGE).md5sum | awk '{print $$1}')"${CL_RST}
-	@echo -e ${CL_CYN}"Size   : "${CL_MAG}" $(shell du -hs $(AOKP_TARGET_PACKAGE) | awk '{print $$1}')"${CL_RST}
-	@echo -e ${CL_CYN}"============================================================================"${CL_RST}
 	@echo -e ""
+	@echo -e ${CL_BLD}${CL_GRN}"===============================-Package complete-==============================="${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Zip: "${CL_YLW} $(AOKP_TARGET_PACKAGE)${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"MD5: "${CL_YLW}" `cat $(AOKP_TARGET_PACKAGE).md5sum | cut -d ' ' -f 1`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Size:"${CL_YLW}" `ls -lah $(AOKP_TARGET_PACKAGE) | cut -d ' ' -f 5`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_GRN}"================================================================================"${CL_RST}
 
 # -----------------------------------------------------------------
 # The factory package
