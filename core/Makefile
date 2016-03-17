@@ -223,7 +223,7 @@ endif
 	$(hide) TARGET_BUILD_TYPE="$(TARGET_BUILD_VARIANT)" \
 			TARGET_BUILD_FLAVOR="$(TARGET_PRODUCT)-$(TARGET_BUILD_VARIANT)" \
 			TARGET_DEVICE="$(TARGET_VENDOR_DEVICE_NAME)" \
-			AOKP_DEVICE="$(TARGET_DEVICE)" \
+			EMOTION_DEVICE="$(TARGET_DEVICE)" \
 			PRODUCT_NAME="$(TARGET_VENDOR_PRODUCT_NAME)" \
 			PRODUCT_BRAND="$(PRODUCT_BRAND)" \
 			PRODUCT_DEFAULT_LOCALE="$(call get-default-product-locale,$(PRODUCT_LOCALES))" \
@@ -1184,7 +1184,7 @@ INTERNAL_SYSTEMIMAGE_FILES := $(filter $(TARGET_OUT)/%, \
 
 systemimage-squisher: $(INTERNAL_SYSTEMIMAGE_FILES)
 	@echo -e "Optimizing PNGs to Shrink ROM Size!"
-	$(hide) APKCERTS=$(APKCERTS_FILE) ./vendor/aokp/tools/squisher
+	$(hide) APKCERTS=$(APKCERTS_FILE) ./vendor/emotion/tools/squisher
 
 .PHONY: systemimage-squisher
 
@@ -1197,7 +1197,7 @@ FULL_SYSTEMIMAGE_DEPS := $(INTERNAL_SYSTEMIMAGE_FILES) $(INTERNAL_USERIMAGES_DEP
 # system image.
 INSTALLED_FILES_FILE := $(PRODUCT_OUT)/installed-files.txt
 $(INSTALLED_FILES_FILE): $(FULL_SYSTEMIMAGE_DEPS)
-	$(hide) ./vendor/aokp/tools/changelog
+	$(hide) ./vendor/emotion/tools/changelog
 	$(hide) mv $(PRODUCT_OUT)/Changelog.txt $(PRODUCT_OUT)/$(PLATFORM_VERSION)-$(TARGET_PRODUCT).txt
 	@echo Installed file list: $@
 	@mkdir -p $(dir $@)
@@ -1890,7 +1890,7 @@ endif
 ifeq ($(WITH_GMS),true)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
 else
-ifneq ($(AOKP_BUILD),)
+ifneq ($(EMOTION_BUILD),)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
 else
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
@@ -1928,15 +1928,15 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   $(if $(OEM_OTA_CONFIG), -o $(OEM_OTA_CONFIG)) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-AOKP_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AOKP_BUILD_VERSION).zip
+EMOTION_TARGET_PACKAGE := $(PRODUCT_OUT)/$(EMOTION_BUILD_VERSION).zip
 
 .PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
 	$(hide) find $(PRODUCT_OUT) -maxdepth 1 -xdev -samefile $(INTERNAL_OTA_PACKAGE_TARGET) | grep -v ota-$(FILE_NAME_TAG) | xargs rm -f
 	$(hide) rm -f $(PRODUCT_OUT)/*.md5sum
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(AOKP_TARGET_PACKAGE)
-	$(hide) (cd `dirname $(AOKP_TARGET_PACKAGE)` && $(MD5SUM) `basename $(AOKP_TARGET_PACKAGE)` > $(AOKP_TARGET_PACKAGE).md5sum)
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(EMOTION_TARGET_PACKAGE)
+	$(hide) (cd `dirname $(EMOTION_TARGET_PACKAGE)` && $(MD5SUM) `basename $(EMOTION_TARGET_PACKAGE)` > $(EMOTION_TARGET_PACKAGE).md5sum)
 	@echo -e ${CL_CYN}"============================================================================"${CL_RST}
 	@echo -e ${CL_RED}"                    ______"${CL_MAG}"  _____"${CL_CYN}"   __  __"${CL_BLU}"   _____"${CL_RST}
 	@echo -e ${CL_RED}"                   /\\\\  _  \\\\"${CL_MAG}"/\\\\  __\`\\\\"${CL_CYN}"/\\\\ \\\\/\\\\ \\\\"${CL_BLU}" /\\\\  _ \`\\\\"${CL_RST}
@@ -1948,9 +1948,9 @@ bacon: otapackage
 	@echo -e ""
 	@echo -e ""
 	@echo -e ${CL_BLD}${CL_GRN}"===============================-Package complete-==============================="${CL_RST}
-	@echo -e ${CL_BLD}${CL_RED}"Zip: "${CL_YLW} $(AOKP_TARGET_PACKAGE)${CL_RST}
-	@echo -e ${CL_BLD}${CL_RED}"MD5: "${CL_YLW}" `cat $(AOKP_TARGET_PACKAGE).md5sum | cut -d ' ' -f 1`"${CL_RST}
-	@echo -e ${CL_BLD}${CL_RED}"Size:"${CL_YLW}" `ls -lah $(AOKP_TARGET_PACKAGE) | cut -d ' ' -f 5`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Zip: "${CL_YLW} $(EMOTION_TARGET_PACKAGE)${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"MD5: "${CL_YLW}" `cat $(EMOTION_TARGET_PACKAGE).md5sum | cut -d ' ' -f 1`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Size:"${CL_YLW}" `ls -lah $(EMOTION_TARGET_PACKAGE) | cut -d ' ' -f 5`"${CL_RST}
 	@echo -e ${CL_BLD}${CL_GRN}"================================================================================"${CL_RST}
 
 # -----------------------------------------------------------------

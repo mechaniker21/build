@@ -61,7 +61,7 @@ endif
 
 endif # CALLED_FROM_SETUP
 
--include $(TOPDIR)vendor/aokp/tools/colors.mk
+-include $(TOPDIR)vendor/emotion/tools/colors.mk
 
 ifneq ($(PRINT_BUILD_CONFIG),)
 HOST_OS_EXTRA:=$(shell python -c "import platform; print(platform.platform())")
@@ -69,7 +69,7 @@ HOST_OS_EXTRA:=$(shell python -c "import platform; print(platform.platform())")
 $(info  $(BLDMAG)$(LINE)$(RST))
 $(info   PLATFORM_VERSION_CODENAME = $(BLDBLU)$(PLATFORM_VERSION_CODENAME)$(RST))
 $(info   PLATFORM_VERSION = $(BLDBLU)$(PLATFORM_VERSION)$(RST))
-$(info   AOKP_VERSION = $(BLDBLU)$(AOKP_VERSION)$(RST))
+$(info   EMOTION_VERSION = $(BLDBLU)$(EMOTION_VERSION)$(RST))
 $(info   TARGET_PRODUCT = $(BLDBLU)$(TARGET_PRODUCT)$(RST))
 $(info   TARGET_BUILD_VARIANT = $(BLDBLU)$(TARGET_BUILD_VARIANT)$(RST))
 $(info   TARGET_BUILD_TYPE = $(BLDBLU)$(TARGET_BUILD_TYPE)$(RST))

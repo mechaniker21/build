@@ -647,15 +647,15 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   script.Print("*      \\ \\_\\ \\_\\ \\_____\\ \\_\\ \\_\\\\\\ \\_\\    *");
   script.Print("*       \\/_/\\/_/\\/_____/\\/_/\\/_/ \\/_/    *");
   script.Print("*                                        *");
-  script.Print("*                         http://aokp.co *");
+  script.Print("*                         http://emotion.co *");
   script.Print("******************************************");
 
-  aokpv = GetBuildProp("ro.aokp.version", OPTIONS.info_dict)
-  if os.getenv("AOKP_BUILD") is not None:
-    build = ' '.join(aokpv.split('_')[3].split('-')).title()
+  emotionv = GetBuildProp("ro.emotion.version", OPTIONS.info_dict)
+  if os.getenv("EMOTION_BUILD") is not None:
+    build = ' '.join(emotionv.split('_')[3].split('-')).title()
     script.Print("*   Version: %s"%(build));
-  elif os.getenv("AOKP_BUILDTYPE") is not None:
-    build = ' '.join(aokpv.split('_')[2:]).title()
+  elif os.getenv("EMOTION_BUILDTYPE") is not None:
+    build = ' '.join(emotionv.split('_')[2:]).title()
     script.Print("*   Version: %s"%(build));
   else:
     build = GetBuildProp("ro.build.date", OPTIONS.info_dict)
@@ -664,7 +664,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Print("******************************************");
     script.Print("*   Compiled: %s"%(build));
 
-  device = GetBuildProp("ro.aokp.device", OPTIONS.info_dict)
+  device = GetBuildProp("ro.emotion.device", OPTIONS.info_dict)
   if GetBuildProp("ro.product.model", OPTIONS.info_dict) is not None:
       model = GetBuildProp("ro.product.model", OPTIONS.info_dict)
       script.Print("*   Device: %s (%s)"%(model, device));
