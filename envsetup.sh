@@ -2589,6 +2589,19 @@ function mk_timer()
         printf "(%s seconds)" $secs
     fi
     printf " ####${color_reset}\n\n"
+    echo
+    if [ -z "$JENK_ENV" ] ; then
+        if [ $ret -eq 0 ] ; then
+            for i in "$@"; do
+                case $i in
+                    bacon|otapackage)
+                        . ./vendor/emotion/tools/res/emotion
+                        ;;
+                    *)
+                esac
+            done
+        fi
+    fi
     return $ret
 }
 
