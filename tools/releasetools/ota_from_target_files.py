@@ -638,17 +638,18 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   system_progress = 0.75
 
-  script.Print("******************************************");
-  script.Print("*    ______  _____   __  __   _____      *");
-  script.Print("*   /\\  _  \\/\\  __`\\/\\ \\/\\ \\ /\\  _ `\\    *");
-  script.Print("*   \\ \\ \\L\\ \\ \\ \\/\\ \\ \\ \\/'/'\\ \\ \\L\\ \\   *");
-  script.Print("*    \\ \\  __ \\ \\ \\ \\ \\ \\ , <  \\ \\ ,__/   *");
-  script.Print("*     \\ \\ \\/\\ \\ \\ \\_\\ \\ \\ \\\\\\`\\ \\ \\ \\/    *");
-  script.Print("*      \\ \\_\\ \\_\\ \\_____\\ \\_\\ \\_\\\\\\ \\_\\    *");
-  script.Print("*       \\/_/\\/_/\\/_____/\\/_/\\/_/ \\/_/    *");
-  script.Print("*                                        *");
-  script.Print("*                         http://emotion.co *");
-  script.Print("******************************************");
+  script.Print("************************************************");
+  script.Print("*   ________________________                   *");
+  script.Print("*   \                       \                  *");
+  script.Print("*    \     __________________\__________       *");
+  script.Print("*     \    \                            \      *");
+  script.Print("*      \    \_________________      _____\     *");
+  script.Print("*       \                     \     \          *");
+  script.Print("*        \_____________________\     \         *");
+  script.Print("*                               \     \        *");
+  script.Print("*                                \_____\       *");
+  script.Print("*                         http://emotroid.com  *");
+  script.Print("************************************************");
 
   emotionv = GetBuildProp("ro.emotion.version", OPTIONS.info_dict)
   if os.getenv("EMOTION_BUILD") is not None:
@@ -659,19 +660,19 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Print("*   Version: %s"%(build));
   else:
     build = GetBuildProp("ro.build.date", OPTIONS.info_dict)
-    script.Print("******************************************");
-    script.Print("************ UNOFFICIAL BUILD ************");
-    script.Print("******************************************");
+    script.Print("************************************************");
+    script.Print("**************** OFFICIAL BUILD ****************");
+    script.Print("************************************************");
     script.Print("*   Compiled: %s"%(build));
 
   device = GetBuildProp("ro.emotion.device", OPTIONS.info_dict)
   if GetBuildProp("ro.product.model", OPTIONS.info_dict) is not None:
       model = GetBuildProp("ro.product.model", OPTIONS.info_dict)
       script.Print("*   Device: %s (%s)"%(model, device));
-      script.Print("******************************************");
+      script.Print("************************************************");
   else:
       script.Print("*   Device: %s "%(device));
-      script.Print("******************************************");
+      script.Print("************************************************");
 
 
   if OPTIONS.wipe_user_data:
