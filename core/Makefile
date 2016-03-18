@@ -1937,15 +1937,6 @@ bacon: otapackage
 	$(hide) rm -f $(PRODUCT_OUT)/*.md5sum
 	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(EMOTION_TARGET_PACKAGE)
 	$(hide) (cd `dirname $(EMOTION_TARGET_PACKAGE)` && $(MD5SUM) `basename $(EMOTION_TARGET_PACKAGE)` > $(EMOTION_TARGET_PACKAGE).md5sum)
-	@echo -e ${CL_CYN}"============================================================================"${CL_RST}
-	@echo -e ${CL_RED}"                    ______"${CL_MAG}"  _____"${CL_CYN}"   __  __"${CL_BLU}"   _____"${CL_RST}
-	@echo -e ${CL_RED}"                   /\\\\  _  \\\\"${CL_MAG}"/\\\\  __\`\\\\"${CL_CYN}"/\\\\ \\\\/\\\\ \\\\"${CL_BLU}" /\\\\  _ \`\\\\"${CL_RST}
-	@echo -e ${CL_RED}"                   \\\\ \\\\ \\\\L\\\\ \\\\"${CL_MAG}" \\\\ \\\\/\\\\ \\\\"${CL_CYN}" \\\\ \\\\/'/'"${CL_BLU}"\\\\ \\\\ \\\\L\\\\ \\\\"${CL_RST}
-	@echo -e ${CL_RED}"                    \\\\ \\\\  __ \\\\"${CL_MAG}" \\\\ \\\\ \\\\ \\\\"${CL_CYN}" \\\\ , <"${CL_BLU}"  \\\\ \\\\ ,__/"${CL_RST}
-	@echo -e ${CL_RED}"                     \\\\ \\\\ \\\\/\\\\ \\\\"${CL_MAG}" \\\\ \\\\_\\\\ \\\\"${CL_CYN}" \\\\ \\\\\\\\\`\\\\"${CL_BLU}" \\\\ \\\\ \\\\/"${CL_RST}
-	@echo -e ${CL_RED}"                      \\\\ \\\\_\\\\ \\\\_\\\\"${CL_MAG}" \\\\_____\\\\"${CL_CYN}" \\\\_\\\\ \\\\_\\\\"${CL_BLU}"\\\\ \\\\_\\\\"${CL_RST}
-	@echo -e ${CL_RED}"                       \\\\/_/\\\\/_/"${CL_MAG}"\\\\/_____/"${CL_CYN}"\\\\/_/\\\\/_/"${CL_BLU}" \\\\/_/"${CL_RST}
-	@echo -e ""
 	@echo -e ""
 	@echo -e ${CL_BLD}${CL_GRN}"===============================-Package complete-==============================="${CL_RST}
 	@echo -e ${CL_BLD}${CL_RED}"Zip: "${CL_YLW} $(EMOTION_TARGET_PACKAGE)${CL_RST}
