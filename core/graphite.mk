@@ -75,7 +75,8 @@ LOCAL_DISABLE_GRAPHITE := \
 	libavcodec \
 	libavformat \
 	libft2 \
-	libncurses
+	libncurses \
+	$(NO_OPTIMIZATIONS)
 
     # Check if there's already something set somewhere.
     ifndef LOCAL_DISABLE_GRAPHITE
@@ -127,7 +128,8 @@ LOCAL_ENABLE_NEST := \
 	libdl \
 	libm \
 	tzdata \
-	bionic-benchmarks
+	bionic-benchmarks \
+	$(NO_OPTIMIZATIONS)
 
  ifneq ($(filter $(LOCAL_ENABLE_NEST), $(LOCAL_MODULE)),)
   ifndef LOCAL_IS_HOST_MODULE

@@ -1,5 +1,5 @@
 # Copyright (C) 2015 The SaberMod Project
-#
+# Copyright (C) 2014-2015 UBER
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,36 +19,66 @@ ifeq ($(strip $(LOCAL_STRICT_ALIASING)),true)
   endif
 endif
 
-ifneq (1,$(words $(filter $(LOCAL_DISABLE_STRICT_ALIASING), $(LOCAL_MODULE))))
-ifdef  LOCAL_CONLYFLAGS
+ifeq ($(LOCAL_STRICT_ALIASING),true)
+ifeq (1,$(words $(filter $(LOCAL_FORCE_DISABLE_STRICT_ALIASING),$(LOCAL_MODULE))))
+ifdef LOCAL_CONLYFLAGS
 LOCAL_CONLYFLAGS += \
-	-fstrict-aliasing \
-	-Werror=strict-aliasing
+	$(DISABLE_STRICT)
 else
 LOCAL_CONLYFLAGS := \
-	-fstrict-aliasing \
-	-Werror=strict-aliasing
+	$(DISABLE_STRICT)
 endif
-
 ifdef LOCAL_CPPFLAGS
 LOCAL_CPPFLAGS += \
-	-fstrict-aliasing \
-	-Werror=strict-aliasing
+	$(DISABLE_STRICT)
 else
 LOCAL_CPPFLAGS := \
-	-fstrict-aliasing \
-	-Werror=strict-aliasing
+	$(DISABLE_STRICT)
+endif
+endif
+ifneq (1,$(words $(filter $(LOCAL_DISABLE_STRICT_ALIASING),$(LOCAL_MODULE))))
+ifdef LOCAL_CONLYFLAGS
+LOCAL_CONLYFLAGS += \
+	$(STRICT_ALIASING_FLAGS)
+else
+LOCAL_CONLYFLAGS := \
+	$(STRICT_ALIASING_FLAGS)
+endif
+ifdef LOCAL_CPPFLAGS
+LOCAL_CPPFLAGS += \
+	$(STRICT_ALIASING_FLAGS)
+else
+LOCAL_CPPFLAGS := \
+	$(STRICT_ALIASING_FLAGS)
 endif
 ifndef LOCAL_CLANG
 LOCAL_CONLYFLAGS += \
-	-Wstrict-aliasing=3
+	$(STRICT_GCC_LEVEL)
 LOCAL_CPPFLAGS += \
-	-Wstrict-aliasing=3
+	$(STRICT_GCC_LEVEL)
 else
 LOCAL_CONLYFLAGS += \
-	-Wstrict-aliasing=2
+	$(STRICT_CLANG_LEVEL)
 LOCAL_CPPFLAGS += \
-	-Wstrict-aliasing=2
+	$(STRICT_CLANG_LEVEL)
+endif
+endif
+else
+ifeq (1,$(words $(filter $(LOCAL_FORCE_DISABLE_STRICT_ALIASING),$(LOCAL_MODULE))))
+ifdef LOCAL_CONLYFLAGS
+LOCAL_CONLYFLAGS += \
+	$(DISABLE_STRICT)
+else
+LOCAL_CONLYFLAGS := \
+	$(DISABLE_STRICT)
+endif
+ifdef LOCAL_CPPFLAGS
+LOCAL_CPPFLAGS += \
+	$(DISABLE_STRICT)
+else
+LOCAL_CPPFLAGS := \
+	$(DISABLE_STRICT)
+endif
 endif
 endif
 
@@ -142,16 +172,30 @@ ifeq ($(strip $(LOCAL_STRICT_ALIASING)),true)
     busybox \
     libOmxVenc \
     fio \
-    libbluetooth_jni
+    libbluetooth_jni \
+    $(NO_OPTIMIZATIONS)
+ endif
+
+DISABLE_STRICT := \
+	-fno-strict-aliasing
+
+STRICT_ALIASING_FLAGS := \
+	-fstrict-aliasing \
+	-Werror=strict-aliasing
+
+STRICT_GCC_LEVEL := \
+	-Wstrict-aliasing=3
+
+STRICT_CLANG_LEVEL := \
+	-Wstrict-aliasing=2
 
   # Check if there's already something somewhere.
   ifndef LOCAL_DISABLE_STRICT_ALIASING
     LOCAL_DISABLE_STRICT_ALIASING := \
-      $(LOCAL_BASE_DISABLE_STRICT_ALIASING)
+      $(LOCAL_BASE_DISABLE_STRICT_ALIASING) \
+      $(LOCAL_FORCE_DISABLE_STRICT_ALIASING)
   else
     LOCAL_DISABLE_STRICT_ALIASING += \
-      $(LOCAL_BASE_DISABLE_STRICT_ALIASING)
+      $(LOCAL_BASE_DISABLE_STRICT_ALIASING) \
+      $(LOCAL_FORCE_DISABLE_STRICT_ALIASING)
   endif
-endif
-
-###

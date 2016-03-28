@@ -40,6 +40,11 @@ endif
 # CPU Tuning flags
 include $(BUILD_SYSTEM)/tune.mk
 
+# Gcc Tuning Optimization
+ifeq ($(GCC_ONLY_OPTIMIZATION),true)
+  include $(BUILD_SYSTEM)/gcconly.mk
+endif
+
 # Strict Aliasing optimizations
 ifeq ($(LOCAL_STRICT_ALIASING),true)
   include $(BUILD_SYSTEM)/strict.mk
