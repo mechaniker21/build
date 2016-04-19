@@ -223,6 +223,7 @@ endif
 # Include DragonTC Optimizations
 ifneq ($(DISABLE_DTC_OPTS),true)
   include $(BUILD_SYSTEM)/dragontc.mk
+  include $(BUILD_SYSTEM)/hyperopts.mk
 endif
 
 # Add option to make gcc the default for device build
