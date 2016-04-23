@@ -2,16 +2,16 @@
 BLUETOOTH := libbluetooth_jni bluetooth.default bluetooth.mapsapi libbt-brcm_stack audio.a2dp.default libbt-brcm_gki libbt-utils libbt-qcom_sbc_decoder libbt-brcm_bta libbt-vendor libbtprofile libbtdevice libbtcore bdt bdtest libbt-hci libosi ositests net_test_osi net_test_device net_test_btcore net_bdtool net_hci bdAddrLoader android.bluetooth.client.map android.bluetooth.client.pbap
 
 # Disable Force ARM Instruction Set Modules
-DISABLE_ARM_MODE :=
+DISABLE_ARM_MODE := $(NO_OPTIMIZATIONS)
 
 # Disable IPA Optimizations Modules
-DISABLE_ANALYZER := $(BLUETOOTH)
+DISABLE_ANALYZER := $(BLUETOOTH) $(NO_OPTIMIZATIONS)
 
 # Disable OpenMP Modules
-DISABLE_OPENMP := $(BLUETOOTH)
+DISABLE_OPENMP := $(BLUETOOTH) $(NO_OPTIMIZATIONS)
 
 # Disable Memory Leak Sanitizer Modules
-DISABLE_SANITIZE_LEAK := $(BLUETOOTH)
+DISABLE_SANITIZE_LEAK := $(BLUETOOTH) $(NO_OPTIMIZATIONS)
 
 # Clean local module flags
 my_cflags :=  $(filter-out -Wall -Werror -Werror=% -g,$(my_cflags))
