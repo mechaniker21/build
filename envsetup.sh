@@ -1791,13 +1791,13 @@ function addemotion() {
 
 function emotionremote()
 {
+    if ! git rev-parse --git-dir &> /dev/null
+    then
+        echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
+        return 1
+    fi
     git remote rm emotionremote 2> /dev/null
     GERRIT_REMOTE=$(git config --get remote.github.projectname)
-    if [ -z "$GERRIT_REMOTE" ]
-    then
-        echo Unable to set up the git remote, are you under a git repo?
-        return 0
-    fi
     EMOTIONUSER=$(git config --get review.gerrit.emotion.co.username)
     if [ -z "$EMOTIONUSER" ]
     then
@@ -1805,17 +1805,18 @@ function emotionremote()
     else
         git remote add emotionremote ssh://$EMOTIONUSER@gerrit.emotion.co:29418/$GERRIT_REMOTE
     fi
-    echo You can now push to "emotionremote".
+    echo "Remote 'emotionremote' created"
 }
 
 function aospremote()
 {
-    git remote rm aosp 2> /dev/null
-    if [ ! -d .git ]
+    if ! git rev-parse --git-dir &> /dev/null
     then
-        echo .git directory not found. Please run this from the root directory of the Android repository you wish to set up.
+        echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
+        return 1
     fi
-    PROJECT=`pwd -P | sed s#$ANDROID_BUILD_TOP/##g`
+    git remote rm aosp 2> /dev/null
+    PROJECT=${$(pwd -P)#$ANDROID_BUILD_TOP/}
     if (echo $PROJECT | grep -qv "^device")
     then
         PFX="platform/"
@@ -1826,12 +1827,13 @@ function aospremote()
 
 function cafremote()
 {
-    git remote rm caf 2> /dev/null
-    if [ ! -d .git ]
+    if ! git rev-parse --git-dir &> /dev/null
     then
-        echo .git directory not found. Please run this from the root directory of the Android repository you wish to set up.
+        echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
+        return 1
     fi
-    PROJECT=`pwd -P | sed s#$ANDROID_BUILD_TOP/##g`
+    git remote rm caf 2> /dev/null
+    PROJECT=${$(pwd -P)#$ANDROID_BUILD_TOP/}
     if (echo $PROJECT | grep -qv "^device")
     then
         PFX="platform/"
