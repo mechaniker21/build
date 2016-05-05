@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Set Bluetooth Modules
+BLUETOOTH := libbluetooth_jni bluetooth.mapsapi bluetooth.default bluetooth.mapsapi libbt-brcm_stack audio.a2dp.default libbt-brcm_gki libbt-utils libbt-qcom_sbc_decoder libbt-brcm_bta libbt-brcm_stack libbt-vendor libbtprofile libbtdevice libbtcore bdt bdtest libbt-hci libosi ositests libbluetooth_jni net_test_osi net_test_device net_test_btcore net_bdtool net_hci bdAddrLoader
+
 #######################
 ##  D R A G O N T C  ##
 #######################
@@ -63,8 +66,8 @@ endif
 #################
 
 # Polly flags for use with Clang
-POLLY := -mllvm -polly \
-  -mllvm -polly-parallel -lgomp \
+POLLY := -O3 -mllvm -polly \
+  -mllvm -polly-parallel \
   -mllvm -polly-parallel-force \
   -mllvm -polly-ast-use-context \
   -mllvm -polly-vectorizer=polly \
@@ -93,6 +96,7 @@ DISABLE_POLLY_arm := \
   libLLVMScalarOpts \
   libLLVMSupport \
   libLLVMMC \
+  libLLVMMCParser \
   libminui \
   libF77blas \
   libF77blasV8 \
@@ -104,6 +108,8 @@ DISABLE_POLLY_arm := \
   libjni_latinime_common_static \
   libvterm \
   libxml2 \
+  libc_freebsd \
+  libc_tzcode \
   libstagefright_amrwbenc \
   libstagefright_soft_amrwbenc \
   $(NO_OPTIMIZATIONS)
@@ -148,19 +154,21 @@ endif
 DISABLE_POLLY := \
   $(DISABLE_POLLY_$(TARGET_ARCH)) \
   $(DISABLE_DTC) \
+  $(BLUETOOTH) \
   $(LOCAL_DISABLE_POLLY)
+
+# Set POLLY based on DISABLE_POLLU
+ifeq (1,$(words $(filter $(DISABLE_POLLY),$(LOCAL_MODULE))))
+  POLLY := -Os
+endif
 
 ifeq ($(my_clang),true)
   ifndef LOCAL_IS_HOST_MODULE
     # Possible conflicting flags will be filtered out to reduce argument
     # size and to prevent issues with locally set optimizations.
     my_cflags :=  $(filter-out -Wall -Werror -g -O3 -O2 -Os -O1 -O0 -Og -Oz -Wextra -Weverything,$(my_cflags))
-    # Enable -O3 and Polly if not blacklisted, otherwise use -O2.
-    ifneq (1,$(words $(filter $(DISABLE_POLLY),$(LOCAL_MODULE))))
-      my_cflags += -O3 $(POLLY) -Qunused-arguments -Wno-unknown-warning-option -w
-    else
-      my_cflags += -O3 -Qunused-arguments -Wno-unknown-warning-option -w
-    endif
+    # Enable -O3 and Polly if not blacklisted, otherwise use -Os.
+    my_cflags += $(POLLY) -Qunused-arguments -Wno-unknown-warning-option -w
   endif
 endif
 
@@ -172,8 +180,8 @@ endif
 # Disable modules that don't work with Link Time Optimizations. Split up by arch.
 DISABLE_LTO_arm := libLLVMScalarOpts libjni_latinime_common_static libjni_latinime adbd nit libnetd_client libblas
 DISABLE_THINLTO_arm := libart libart-compiler libsigchain
-DISABLE_LTO_arm64 :=  libLLVMScalarOpts libjni_latinime_common_static libjni_latinime adbd nit libnetd_client libblas
-DISABLE_THINLTO_arm64 := libart libart-compiler libsigchain
+DISABLE_LTO_arm64 := 
+DISABLE_THINLTO_arm64 :=
 
 # Set DISABLE_LTO and DISABLE_THINLTO based on arch
 DISABLE_LTO := \
