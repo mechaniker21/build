@@ -112,6 +112,7 @@ DISABLE_POLLY_arm := \
   libc_tzcode \
   libstagefright_amrwbenc \
   libstagefright_soft_amrwbenc \
+  libart-compiler \
   $(NO_OPTIMIZATIONS)
 
 DISABLE_POLLY_arm64 := \
