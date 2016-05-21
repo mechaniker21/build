@@ -68,7 +68,6 @@ endif
 # Polly flags for use with Clang
 POLLY := -O3 -mllvm -polly \
   -mllvm -polly-parallel \
-  -mllvm -polly-parallel-force \
   -mllvm -polly-ast-use-context \
   -mllvm -polly-vectorizer=polly \
   -mllvm -polly-opt-fusion=max \
@@ -84,8 +83,7 @@ ifeq (1,$(words $(filter 3.8 3.9,$(LLVM_PREBUILTS_VERSION))))
   POLLY += -mllvm -polly-position=after-loopopt \
     -mllvm -polly-run-inliner \
     -mllvm -polly-detect-keep-going \
-    -mllvm -polly-rtc-max-arrays-per-group=40 \
-    -mllvm -polly-register-tiling
+    -mllvm -polly-rtc-max-arrays-per-group=40
 endif
 
 # Disable modules that dont work with Polly. Split up by arch.
@@ -98,8 +96,10 @@ DISABLE_POLLY_arm := \
   libLLVMMC \
   libLLVMMCParser \
   libminui \
+  libgui \
   libF77blas \
   libF77blasV8 \
+  libF77blasAOSP \
   libRSCpuRef \
   libRS	\
   libRSDriver\
@@ -113,6 +113,8 @@ DISABLE_POLLY_arm := \
   libstagefright_amrwbenc \
   libstagefright_soft_amrwbenc \
   libart-compiler \
+#  libvixl \
+#  libart \
   $(NO_OPTIMIZATIONS)
 
 DISABLE_POLLY_arm64 := \

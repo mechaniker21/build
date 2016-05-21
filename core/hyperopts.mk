@@ -1,11 +1,11 @@
-BLUETOOTH += camera.msm8084 gps.msm8084 gralloc.msm8084
+BLUETOOTH += camera.msm8084 gps.msm8084 gralloc.msm8084 libF77blasAOSP
 DISABLE_ARM_MODE := libfs_mgr liblog libunwind libnetutils libziparchive libsync libusbhost libjnigraphics libstagefright_avc_common libmmcamera_interface pppd clatd libsoftkeymasterdevice sdcard logd mm-qcamera-app racoon libdiskconfig libmm-qcamera librmnetctl libjavacore camera.% libandroid_servers libmedia_jni librs_jni libhwui libandroidfw linker $(BLUETOOTH)
 DISABLE_ANALYZER := libbluetooth_jni bluetooth.mapsapi bluetooth.default bluetooth.mapsapi libbt-brcm_stack audio.a2dp.default libbt-brcm_gki libbt-utils libbt-qcom_sbc_decoder libbt-brcm_bta libbt-brcm_stack libbt-vendor libbtprofile libbtdevice libbtcore bdt bdtest libbt-hci libosi ositests libbluetooth_jni net_test_osi net_test_device net_test_btcore net_bdtool net_hci bdAddrLoader camera.msm8084 gps.msm8084 gralloc.msm8084 keystore.msm8084 memtrack.msm8084 hwcomposer.msm8084 audio.primary.msm8084 $(BLUETOOTH)
 DISABLE_OPENMP := libc_tzcode libbluetooth_jni_32 *libblas libF77blas libdl libjni_latinime $(BLUETOOTH)
 DISABLE_SANITIZE_LEAK := libc_dns libc_tzcode $(BLUETOOTH)
 DISABLE_O3 := libaudioflinger $(BLUETOOTH)
 DISABLE_ARCHI := libaudioflinger $(BLUETOOTH)
-DISABLE_CORTEX_STRINGS := $(BLUETOOTH)
+DISABLE_CORTEX_STRINGS := $(BLUETOOTH) *libc*
 CMREMIX_IGNORE_RECOVERY_SIZE := true
 
 # Clean local module flags
@@ -88,15 +88,9 @@ ifeq ($(strip $(ARCHIDROID_OPTIMIZATIONS)),true)
  endif
 endif
 
-# Link binaries with Cortex string routines
+# Link binaries with Cortex-a15 string routines
 ifndef LOCAL_IS_HOST_MODULE
   ifeq ($(filter $(DISABLE_CORTEX_STRINGS), $(LOCAL_MODULE)),)
-    my_ldflags += -L$(BUILD_SYSTEM)/../libs/$(TARGET_ARCH) -lcortex-strings
-    ifneq ($(filter krait a9 a15, $(LOCAL_MODULE)),)
-      my_ldflags += -lbionic-$(TARGET_CPU_VARIANT)
-    endif
-    ifeq ($(TARGET_2ND_CPU_VARIANT), cortex-a53.a57)
-      my_ldflags += -lbionic-a15
-    endif
+    my_ldflags += -L$(BUILD_SYSTEM)/../libs/$(TARGET_ARCH) -lbionic-a15
   endif
 endif
