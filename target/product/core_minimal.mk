@@ -105,8 +105,10 @@ PRODUCT_SYSTEM_SERVER_JARS := \
     ethernet-service \
     wifi-service
 
-# Adoptable external storage f2fs support
+# Adoptable external storage supports both ext4 and f2fs
 PRODUCT_PACKAGES += \
+    e2fsck \
+    make_ext4fs \
     fsck.f2fs \
     mkfs.f2fs \
 
