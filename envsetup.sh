@@ -689,10 +689,12 @@ function lunch()
         # if we can't find a product, try to grab it off the CM github
         T=$(gettop)
         pushd $T > /dev/null
+        build/tools/emotroid.py $product
         build/tools/roomservice.py $product
         popd > /dev/null
         check_product $product
     else
+        build/tools/emotroid.py $product true
         build/tools/roomservice.py $product true
     fi
     TARGET_PRODUCT=$product \
