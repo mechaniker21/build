@@ -124,9 +124,38 @@ endif
 
 endif # CALLED_FROM_SETUP
 
+-include $(TOPDIR)vendor/emotion/tools/colors.mk
+
 ifneq ($(PRINT_BUILD_CONFIG),)
-$(info ============================================)
-$(foreach v, $(print_build_config_vars),\
-  $(info $v=$($(v))))
-$(info ============================================)
+HOST_OS_EXTRA:=$(shell python -c "import platform; print(platform.platform())")
+
+$(info  $(BLDMAG)$(LINE)$(RST))
+$(info   PLATFORM_VERSION_CODENAME = $(BLDBLU)$(PLATFORM_VERSION_CODENAME)$(RST))
+$(info   PLATFORM_VERSION = $(BLDBLU)$(PLATFORM_VERSION)$(RST))
+$(info   EMOTION_VERSION = $(BLDBLU)$(EMOTION_VERSION)$(RST))
+$(info   TARGET_PRODUCT = $(BLDBLU)$(TARGET_PRODUCT)$(RST))
+$(info   TARGET_BUILD_VARIANT = $(BLDBLU)$(TARGET_BUILD_VARIANT)$(RST))
+$(info   TARGET_BUILD_TYPE = $(BLDBLU)$(TARGET_BUILD_TYPE)$(RST))
+$(info   TARGET_BUILD_APPS = $(BLDBLU)$(TARGET_BUILD_APPS)$(RST))
+$(info   TARGET_ARCH = $(BLDBLU)$(TARGET_ARCH)$(RST))
+$(info   TARGET_ARCH_VARIANT = $(BLDBLU)$(TARGET_ARCH_VARIANT)$(RST))
+$(info   TARGET_CPU_VARIANT = $(BLDBLU)$(TARGET_CPU_VARIANT)$(RST))
+$(info   TARGET_2ND_ARCH = $(BLDBLU)$(TARGET_2ND_ARCH)$(RST))
+$(info   TARGET_2ND_ARCH_VARIANT = $(BLDBLU)$(TARGET_2ND_ARCH_VARIANT)$(RST))
+$(info   TARGET_2ND_CPU_VARIANT = $(BLDBLU)$(TARGET_2ND_CPU_VARIANT)$(RST))
+$(info   HOST_ARCH = $(BLDBLU)$(HOST_ARCH)$(RST))
+$(info   HOST_OS = $(BLDBLU)$(HOST_OS)$(RST))
+$(info   HOST_OS_EXTRA = $(BLDBLU)$(HOST_OS_EXTRA)$(RST))
+$(info   HOST_BUILD_TYPE = $(BLDBLU)$(HOST_BUILD_TYPE)$(RST))
+$(info   BUILD_ID = $(BLDBLU)$(BUILD_ID)$(RST))
+$(info   OUT_DIR = $(BLDBLU)$(OUT_DIR)$(RST))
+ifeq ($(CYNGN_TARGET),true)
+$(info   CYNGN_TARGET = $(BLDBLU)$(CYNGN_TARGET)$(RST))
+$(info   CYNGN_FEATURES = $(BLDBLU)$(CYNGN_FEATURES)$(RST))
+endif
+ifneq ($(USE_CCACHE),)
+$(info   CCACHE_DIR = $(BLDBLU)$(CCACHE_DIR)$(RST))
+$(info   CCACHE_BASEDIR = $(BLDBLU)$(CCACHE_BASEDIR)$(RST))
+endif
+$(info  $(BLDMAG)$(LINE)$(RST))
 endif

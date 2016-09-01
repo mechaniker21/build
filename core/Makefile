@@ -10,6 +10,7 @@ ifneq ($(BUILD_WITH_COLORS),0)
   CL_MAG="\033[35m"
   CL_CYN="\033[36m"
   CL_RST="\033[0m"
+  CL_BLD="\033[1m"
 endif
 
 # HACK: clear LOCAL_PATH from including last build target before calling
@@ -230,7 +231,11 @@ system_prop_file := $(TARGET_SYSTEM_PROP)
 else
 system_prop_file := $(wildcard $(TARGET_DEVICE_DIR)/system.prop)
 endif
+
+.PHONY: $(intermediate_system_build_prop)
+
 $(intermediate_system_build_prop): $(BUILDINFO_SH) $(INTERNAL_BUILD_ID_MAKEFILE) $(BUILD_SYSTEM)/version_defaults.mk $(system_prop_file) $(INSTALLED_ANDROID_INFO_TXT_TARGET)
+
 	@echo Target buildinfo: $@
 	@mkdir -p $(dir $@)
 	$(hide) echo > $@
@@ -244,7 +249,7 @@ endif
 	$(hide) TARGET_BUILD_TYPE="$(TARGET_BUILD_VARIANT)" \
 			TARGET_BUILD_FLAVOR="$(TARGET_BUILD_FLAVOR)" \
 			TARGET_DEVICE="$(TARGET_VENDOR_DEVICE_NAME)" \
-			CM_DEVICE="$(TARGET_DEVICE)" \
+			EMOTION_DEVICE="$(TARGET_DEVICE)" \
 			PRODUCT_NAME="$(TARGET_VENDOR_PRODUCT_NAME)" \
 			PRODUCT_BRAND="$(PRODUCT_BRAND)" \
 			PRODUCT_DEFAULT_LOCALE="$(call get-default-product-locale,$(PRODUCT_LOCALES))" \
@@ -1194,7 +1199,13 @@ INTERNAL_SYSTEMIMAGE_FILES := $(filter $(TARGET_OUT)/%, \
     $(RECOVERY_RESOURCE_ZIP))
 
 
-FULL_SYSTEMIMAGE_DEPS := $(INTERNAL_SYSTEMIMAGE_FILES) $(INTERNAL_USERIMAGES_DEPS)
+systemimage-squisher: $(INTERNAL_SYSTEMIMAGE_FILES)
+	@echo -e "Optimizing PNGs to Shrink ROM Size!"
+	$(hide) APKCERTS=$(APKCERTS_FILE) ./vendor/emotion/tools/squisher
+
+.PHONY: systemimage-squisher
+
+FULL_SYSTEMIMAGE_DEPS := $(INTERNAL_SYSTEMIMAGE_FILES) $(INTERNAL_USERIMAGES_DEPS) systemimage-squisher
 # -----------------------------------------------------------------
 # installed file list
 # Depending on anything that $(BUILT_SYSTEMIMAGE) depends on.
@@ -2096,12 +2107,15 @@ endif
 ifeq ($(WITH_GMS),true)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
 else
-ifneq ($(CM_BUILD),)
+ifneq ($(EMOTION_BUILD),)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
 else
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
 endif
 endif
+
+BOOT_ZIP_FROM_IMAGE_SCRIPT := ./build/tools/releasetools/boot_flash_from_image
+KERNEL_PATH := $(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(TARGET_KERNEL_CONFIG)
 
 ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
     $(INTERNAL_OTA_PACKAGE_TARGET): override_device := auto
@@ -2134,14 +2148,21 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE)
 	   $(if $(OEM_OTA_CONFIG), -o $(OEM_OTA_CONFIG)) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-CM_TARGET_PACKAGE := $(PRODUCT_OUT)/cm-$(CM_VERSION).zip
+EMOTION_TARGET_PACKAGE := $(PRODUCT_OUT)/$(EMOTION_BUILD_VERSION).zip
 
-.PHONY: otapackage bacon
+.PHONY: otapackage bacon bootzip
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(CM_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(CM_TARGET_PACKAGE) > $(CM_TARGET_PACKAGE).md5sum
-	@echo -e ${CL_CYN}"Package Complete: $(CM_TARGET_PACKAGE)"${CL_RST}
+	$(hide) find $(PRODUCT_OUT) -maxdepth 1 -xdev -samefile $(INTERNAL_OTA_PACKAGE_TARGET) | grep -v ota-$(FILE_NAME_TAG) | xargs rm -f
+	$(hide) rm -f $(PRODUCT_OUT)/*.md5sum
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(EMOTION_TARGET_PACKAGE)
+	$(hide) (cd `dirname $(EMOTION_TARGET_PACKAGE)` && $(MD5SUM) `basename $(EMOTION_TARGET_PACKAGE)` > $(EMOTION_TARGET_PACKAGE).md5sum)
+	@echo -e ""
+	@echo -e ${CL_BLD}${CL_GRN}"===============================-Package complete-==============================="${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Zip: "${CL_YLW} $(EMOTION_TARGET_PACKAGE)${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"MD5: "${CL_YLW}" `cat $(EMOTION_TARGET_PACKAGE).md5sum | cut -d ' ' -f 1`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_RED}"Size:"${CL_YLW}" `ls -lah $(EMOTION_TARGET_PACKAGE) | cut -d ' ' -f 5`"${CL_RST}
+	@echo -e ${CL_BLD}${CL_GRN}"================================================================================"${CL_RST}
 
 endif    # build_ota_package
 # -----------------------------------------------------------------
@@ -2172,6 +2193,17 @@ $(INTERNAL_FACTORY_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 
 .PHONY: factorypackage
 factorypackage: $(INTERNAL_FACTORY_PACKAGE_TARGET)
+
+bootzip: bootimage
+	$(BOOT_ZIP_FROM_IMAGE_SCRIPT) \
+	   $(recovery_fstab) \
+	   $(OUT) \
+	   $(TARGET_DEVICE)
+
+endif    # recovery_fstab is defined
+endif    # TARGET_NO_KERNEL != true
+endif    # TARGET_DEVICE != generic*
+endif    # TARGET_PRODUCT != sdk
 
 # -----------------------------------------------------------------
 # The update package
