@@ -2748,8 +2748,8 @@ if ! __detect_shell > /dev/null; then
     echo "WARNING: Only bash and zsh are supported, use of other shell may lead to erroneous results"
 fi
 
-echo "including vendor/aokp/vendorsetup.sh"
-. vendor/aokp/vendorsetup.sh
+echo "including vendor/emotion/vendorsetup.sh"
+. vendor/emotion/vendorsetup.sh
 
 # Add completions
 check_bash_version && {
