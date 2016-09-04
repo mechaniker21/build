@@ -685,13 +685,11 @@ function lunch()
         # if we can't find a product, try to grab it off the EMOTION github
         T=$(gettop)
         pushd $T > /dev/null
-        build/tools/emotroid.py $product
-        build/tools/roomservice.py $product
+        build/tools/roomservice.py $device
         popd > /dev/null
         check_product $product
     else
-        build/tools/emotroid.py $product true
-        build/tools/roomservice.py $product true
+        build/tools/roomservice.py -d $device
     fi
     TARGET_PRODUCT=$product \
     TARGET_BUILD_VARIANT=$variant \
@@ -1869,13 +1867,13 @@ function addemotion() {
 
 function emotionremote()
 {
-    git remote rm emotionremote 2> /dev/null
-    GERRIT_REMOTE=$(git config --get remote.github.projectname)
-    if [ -z "$GERRIT_REMOTE" ]
+    if ! git rev-parse --git-dir &> /dev/null
     then
         echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
         return 1
     fi
+    git remote rm emotionremote 2> /dev/null
+    GERRIT_REMOTE=$(git config --get remote.github.projectname)
     EMOTIONUSER=$(git config --get review.gerrit.emotion.co.username)
     if [ -z "$EMOTIONUSER" ]
     then
@@ -1883,7 +1881,7 @@ function emotionremote()
     else
         git remote add emotionremote ssh://$EMOTIONUSER@gerrit.emotion.co:29418/$GERRIT_REMOTE
     fi
-    echo You can now push to "emotionremote".
+    echo "Remote 'emotionremote' created"
 }
 
 function aospremote()
@@ -2748,8 +2746,8 @@ if ! __detect_shell > /dev/null; then
     echo "WARNING: Only bash and zsh are supported, use of other shell may lead to erroneous results"
 fi
 
-echo "including vendor/aokp/vendorsetup.sh"
-. vendor/aokp/vendorsetup.sh
+echo "including vendor/emotion/vendorsetup.sh"
+. vendor/emotion/vendorsetup.sh
 
 # Add completions
 check_bash_version && {
