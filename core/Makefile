@@ -2215,12 +2215,7 @@ bootzip: bootimage
 	$(BOOT_ZIP_FROM_IMAGE_SCRIPT) \
 	   $(recovery_fstab) \
 	   $(OUT) \
-	   $(TARGET_DEVICE)
-
-endif    # recovery_fstab is defined
-endif    # TARGET_NO_KERNEL != true
-endif    # TARGET_DEVICE != generic*
-endif    # TARGET_PRODUCT != sdk
+	   $(TARGET_DEVICE)k
 
 # -----------------------------------------------------------------
 # The update package
