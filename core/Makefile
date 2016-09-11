@@ -79,6 +79,8 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
 ADDITIONAL_DEFAULT_PROPERTIES := $(call uniq-pairs-by-first-component, \
     $(ADDITIONAL_DEFAULT_PROPERTIES),=)
 
+.PHONY: $(INSTALLED_BUILD_PROP_TARGET)
+
 intermediate_system_build_prop := $(call intermediates-dir-for,ETC,system_build_prop)/build.prop
 
 $(INSTALLED_DEFAULT_PROP_TARGET): $(intermediate_system_build_prop)
@@ -1012,7 +1014,8 @@ define build-recoveryimage-target
     $(BOOT_SIGNER) /recovery $(1) $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).pk8 $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).x509.pem $(1))
   $(if $(filter true,$(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SUPPORTS_VBOOT)), \
     $(VBOOT_SIGNER) $(FUTILITY) $(1).unsigned $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VBOOT_SIGNING_KEY).vbpubk $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VBOOT_SIGNING_KEY).vbprivk $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VBOOT_SIGNING_SUBKEY).vbprivk $(1).keyblock $(1))
-  $(hide) $(call assert-max-image-size,$(1),$(BOARD_RECOVERYIMAGE_PARTITION_SIZE))
+  $(if $(filter-out true,$(CMREMIX_IGNORE_RECOVERY_SIZE)), \
+  $(hide) $(call assert-max-image-size,$(1),$(BOARD_RECOVERYIMAGE_PARTITION_SIZE)))
   @echo -e ${CL_CYN}"Made recovery image: $@"${CL_RST}
 endef
 
@@ -1271,10 +1274,10 @@ endef
 $(BUILT_SYSTEMIMAGE): $(FULL_SYSTEMIMAGE_DEPS) $(INSTALLED_FILES_FILE)
 	$(call build-systemimage-target,$@)
 
-ifndef I_WANT_A_QUAIL_STAR
-$(BUILT_SYSTEMIMAGE): checkapi
-$(BUILT_SYSTEMIMAGE): checkapi-cm
-endif
+#ifndef I_WANT_A_QUAIL_STAR
+#$(BUILT_SYSTEMIMAGE): checkapi
+#$(BUILT_SYSTEMIMAGE): checkapi-cm
+#endif
 
 INSTALLED_SYSTEMIMAGE := $(PRODUCT_OUT)/system.img
 SYSTEMIMAGE_SOURCE_DIR := $(TARGET_OUT)

@@ -1555,9 +1555,8 @@ fi
           sh_location = m.group(1)
           found = True
           break
-
     if found:
-      break
+        break
 
   print("putting script in", sh_location)
 

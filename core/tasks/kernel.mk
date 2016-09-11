@@ -238,10 +238,14 @@ ifneq ($(USE_CCACHE),)
     ccache := $(strip $(wildcard $(ccache)))
 endif
 
-ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)
-    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilts/gcc/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/$(KERNEL_TOOLCHAIN_PREFIX)"
+ifneq ($(TARGET_SM_KERNEL),)
+  ifeq ($(HOST_OS),darwin)
+    KERNEL_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilts/gcc/darwin-x86/arm/arm-eabi-$(TARGET_KERNEL_GCC_VERSION)/bin/arm-eabi-"
+  else
+    KERNEL_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/arm-eabi-$(TARGET_KERNEL_GCC_VERSION)/bin/arm-eabi-"
+  endif
 else
-    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
+  KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
 endif
 ccache =
 

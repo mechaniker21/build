@@ -161,10 +161,14 @@ function setpaths()
     gccprebuiltdir=$(get_abs_build_var ANDROID_GCC_PREBUILTS)
 
     # defined in core/config.mk
-    targetgccversion=$(get_build_var TARGET_GCC_VERSION)
+    targetandgccversion=$(get_build_var TARGET_AND_GCC_VERSION)
     targetgccversion2=$(get_build_var 2ND_TARGET_GCC_VERSION)
     targetlegacygccversion=$(get_build_var TARGET_LEGACY_GCC_VERSION)
-    export TARGET_GCC_VERSION=$targetgccversion
+    export TARGET_AND_GCC_VERSION=$targetandgccversion
+
+    # defined in core/config.mk
+    targetkernelgccversion=$(get_build_var TARGET_KERNEL_GCC_VERSION)
+    export TARGET_KERNEL_GCC_VERSION=$targetkernelgccversion
 
     # The gcc toolchain does not exists for windows/cygwin. In this case, do not reference it.
     export ANDROID_TOOLCHAIN=
@@ -175,9 +179,9 @@ function setpaths()
             ;;
         x86_64) toolchaindir=x86/x86_64-linux-android-$targetgccversion/bin
             ;;
-        arm) toolchaindir=arm/arm-linux-androideabi-$targetgccversion/bin
+        arm) toolchaindir=arm/arm-linux-androideabi-$targetandgccversion/bin
             ;;
-        arm64) toolchaindir=aarch64/aarch64-linux-android-$targetgccversion/bin;
+        arm64) toolchaindir=aarch64/aarch64-linux-android-$targetandgccversion/bin;
                toolchaindir2=arm/arm-linux-androideabi-$targetgccversion2/bin
             ;;
         mips|mips64) toolchaindir=mips/mips64el-linux-android-$targetgccversion/bin
@@ -199,10 +203,18 @@ function setpaths()
     case $ARCH in
         arm)
             # Legacy toolchain configuration used for ARM kernel compilation
-            toolchaindir=arm/arm-eabi-$targetlegacygccversion/bin
+            toolchaindir=arm/arm-eabi-$targetkernelgccversion/bin
             if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
                  export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
-                 ANDROID_KERNEL_TOOLCHAIN_PATH="$ARM_EABI_TOOLCHAIN":
+                 export ANDROID_KERNEL_TOOLCHAIN_PATH="$ARM_EABI_TOOLCHAIN":
+            fi
+            ;;
+        arm64)
+            # Legacy toolchain configuration used for ARM64 kernel compilation
+            toolchaindir=aarch64/aarch64-$targetkernelgccversion/bin
+            if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
+                 export AARCH64_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
+                 export ANDROID_KERNEL_TOOLCHAIN_PATH="$AARCH64_TOOLCHAIN":
             fi
             ;;
         *)
@@ -809,6 +821,7 @@ function gettop
             fi
         fi
     fi
+  export ANDROID_BUILD_TOP=$T
 }
 
 # Return driver for "make", if any (eg. static analyzer)
@@ -2579,16 +2592,28 @@ function mk_timer()
     fi
     echo
     if [ $ret -eq 0 ] ; then
-        printf "${color_success}#### make completed successfully "
+        echo -n -e "${color_success}#### ${bldgrn}make completed successfully${rst} "
     else
-        printf "${color_failed}#### make failed to build some targets "
+        echo -n -e "${color_failed}#### ${bldred}make failed to build some targets${rst} "
     fi
     if [ $hours -gt 0 ] ; then
-        printf "(%02g:%02g:%02g (hh:mm:ss))" $hours $mins $secs
+        printf "${bldcya}(%02g:%02g:%02g (hh:mm:ss))${rst}" $hours $mins $secs
     elif [ $mins -gt 0 ] ; then
-        printf "(%02g:%02g (mm:ss))" $mins $secs
+        printf "${bldcya}(%02g:%02g (mm:ss))${rst}" $mins $secs
     elif [ $secs -gt 0 ] ; then
-        printf "(%s seconds)" $secs
+        printf "${bldcya}(%s seconds)${rst}" $secs
+    fi
+    echo -e " ####${color_reset}"
+    echo
+    if [ $ret -eq 0 ] ; then
+        for i in "$@"; do
+            case $i in
+                bacon|bootimage|otapackage|recoveryimage|systemimage)
+                    . ./vendor/cmremix/tools/res/cmremix
+                    ;;
+                *)
+            esac
+        done
     fi
     printf " ####${color_reset}\n\n"
     echo
