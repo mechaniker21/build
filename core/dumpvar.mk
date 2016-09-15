@@ -188,4 +188,3 @@ ifdef GCC_OPTIMIZATION_LEVELS
 $(info   OPTIMIZATIONS=$(GCC_OPTIMIZATION_LEVELS))
 endif
 $(info =====================================================================)
-endif
