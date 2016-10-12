@@ -664,6 +664,43 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   system_progress = 0.75
 
+  script.Print("************************************************");
+  script.Print("*   ________________________                   *");
+  script.Print("*   \                       \                  *");
+  script.Print("*    \     __________________\__________       *");
+  script.Print("*     \    \                            \      *");
+  script.Print("*      \    \_________________      _____\     *");
+  script.Print("*       \                     \     \          *");
+  script.Print("*        \_____________________\     \         *");
+  script.Print("*                               \     \        *");
+  script.Print("*                                \_____\       *");
+  script.Print("*                         http://emotroid.com  *");
+  script.Print("************************************************");
+
+  emotionv = GetBuildProp("ro.emotion.version", OPTIONS.info_dict)
+  if os.getenv("EMOTION_BUILD") is not None:
+    build = ' '.join(emotionv.split('_')[3].split('-')).title()
+    script.Print("*   Version: %s"%(build));
+  elif os.getenv("EMOTION_BUILDTYPE") is not None:
+    build = ' '.join(emotionv.split('_')[2:]).title()
+    script.Print("*   Version: %s"%(build));
+  else:
+    build = GetBuildProp("ro.build.date", OPTIONS.info_dict)
+    script.Print("************************************************");
+    script.Print("**************** NOUGAT BUILD ******************");
+    script.Print("************************************************");
+    script.Print("*   Compiled: %s"%(build));
+
+  device = GetBuildProp("ro.emotion.device", OPTIONS.info_dict)
+  if GetBuildProp("ro.product.model", OPTIONS.info_dict) is not None:
+      model = GetBuildProp("ro.product.model", OPTIONS.info_dict)
+      script.Print("*   Device: %s (%s)"%(model, device));
+      script.Print("************************************************");
+  else:
+      script.Print("*   Device: %s "%(device));
+      script.Print("************************************************");
+
+
   if OPTIONS.wipe_user_data:
     system_progress -= 0.1
   if HasVendorPartition(input_zip):
@@ -790,7 +827,7 @@ endif;
   common.ZipWriteStr(output_zip, "system/build.prop",
                      ""+input_zip.read("SYSTEM/build.prop"))
 
-  common.ZipWriteStr(output_zip, "META-INF/org/cyanogenmod/releasekey",
+  common.ZipWriteStr(output_zip, "META-INF/org/emotion/releasekey",
                      ""+input_zip.read("META/releasekey.txt"))
 
 def WritePolicyConfig(file_name, output_zip):
@@ -822,7 +859,8 @@ def GetBuildProp(prop, info_dict):
   try:
     return info_dict.get("build.prop", {})[prop]
   except KeyError:
-    raise common.ExternalError("couldn't find %s in build.prop" % (prop,))
+    print ("WARNING: could not find %s in build.prop" % (prop,))
+    return None
 
 
 def AddToKnownPaths(filename, known_paths):
