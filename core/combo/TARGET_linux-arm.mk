@@ -33,47 +33,13 @@ ifeq ($(strip $(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT)),)
 TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT := armv5te
 endif
 
-# Decouple android compiler version from kernel compiler version
-ifeq ($(strip $(TARGET_SM_AND)),)
-ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
-$(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION := 4.9
-$(combo_2nd_arch_prefix)TARGET_LEGACY_GCC_VERSION := 4.8
-else
-$(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION := $(TARGET_GCC_VERSION_EXP)
-endif
-else
-$(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION := $(TARGET_SM_AND)
-ifeq (1,$(words $(filter 4.9 5.% 6.%, $(TARGET_SM_AND))))
-$(combo_2nd_arch_prefix)TARGET_LEGACY_GCC_VERSION := 4.8
-endif
-endif
-
-# Decouple kernel compiler version from android compiler version
-ifeq ($(strip $(TARGET_SM_KERNEL)),)
-$(combo_2nd_arch_prefix)TARGET_KERNEL_GCC_VERSION := $($(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION)
-else
-$(combo_2nd_arch_prefix)TARGET_KERNEL_GCC_VERSION := $(TARGET_SM_KERNEL)
-endif
-
-# Allow overriding of NDK library selection
-ifeq ($(strip $(TARGET_NDK_VERSION)),)
-ifeq ($(strip $(TARGET_SM_AND)),)
+# Decouple NDK library selection with platform compiler version
 $(combo_2nd_arch_prefix)TARGET_NDK_GCC_VERSION := 4.9
-else
-$(combo_2nd_arch_prefix)TARGET_NDK_GCC_VERSION := $(TARGET_SM_AND)
-endif
-else
-$(combo_2nd_arch_prefix)TARGET_NDK_GCC_VERSION := $(TARGET_NDK_VERSION)
-endif
 
-# Allow a second arch combo to override the ROM toolchain version
-ifdef 2ND_TARGET_SM_AND_VERSION
-$(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION := $(2ND_TARGET_SM_AND)
-endif
-
-# Allow a second arch combo to override the NDK library selection
-ifdef 2ND_TARGET_NDK_VERSION
-$(combo_2nd_arch_prefix)TARGET_NDK_GCC_VERSION := $(2ND_TARGET_NDK_VERSION)
+ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
+$(combo_2nd_arch_prefix)TARGET_GCC_VERSION := 4.9
+else
+$(combo_2nd_arch_prefix)TARGET_GCC_VERSION := $(TARGET_GCC_VERSION_EXP)
 endif
 
 TARGET_ARCH_SPECIFIC_MAKEFILE := $(BUILD_COMBOS)/arch/$(TARGET_$(combo_2nd_arch_prefix)ARCH)/$(TARGET_$(combo_2nd_arch_prefix)ARCH_VARIANT).mk
@@ -85,8 +51,10 @@ include $(TARGET_ARCH_SPECIFIC_MAKEFILE)
 include $(BUILD_SYSTEM)/combo/fdo.mk
 
 # You can set TARGET_TOOLS_PREFIX to get gcc from somewhere else
-$(combo_2nd_arch_prefix)TARGET_AND_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$($(combo_2nd_arch_prefix)TARGET_AND_GCC_VERSION)
-$(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX := $($(combo_2nd_arch_prefix)TARGET_AND_TOOLCHAIN_ROOT)/bin/arm-linux-androideabi-
+ifeq ($(strip $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)),)
+$(combo_2nd_arch_prefix)TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$($(combo_2nd_arch_prefix)TARGET_GCC_VERSION)
+$(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX := $($(combo_2nd_arch_prefix)TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-androideabi-
+endif
 
 $(combo_2nd_arch_prefix)TARGET_CC := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)gcc
 $(combo_2nd_arch_prefix)TARGET_CXX := $($(combo_2nd_arch_prefix)TARGET_TOOLS_PREFIX)g++
